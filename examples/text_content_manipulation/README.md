@@ -45,3 +45,17 @@ python3 ie.py --gold_file nba_data/gold.${STAGE}.txt --ref_file nba_data/nba.sen
 ```
 
 which uses GPU 0 to run IE models for all `${EXPR_NAME}/ckpt/hypo*.test.txt`. `${STAGE}` can be val or test depending on which stage you want to evaluate. The result will be appended to `${EXPR_NAME}/ckpt/ie_results.${STAGE}.txt`, in which the columns represents training steps, $\textrm{BLEU}(\hat{y}, y')$, IE precision, IE recall, simple precision and simple recall (you don't have to know what simple precision/recall is), respectively.
+
+## evaluate Content scores
+
+After trained your model, you may want to evaluate two content scores via Bert classifier. This part implement is devised from [Bert](https://github.com/asyml/texar/tree/master/examples/bert#use-other-datasetstasks). Firstly, you need to prepare data into TFRecord format as following:
+
+```bash
+python3 prepare_data.py --expr_name ${EXPR_NAME} --step ${step}
+```
+
+Then, run the following command to compute the two content scores:
+
+```bash
+python bert_classifier_main.py  --do_test
+```
