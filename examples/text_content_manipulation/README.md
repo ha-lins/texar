@@ -50,6 +50,7 @@ which uses GPU 0 to run IE models for all `${EXPR_NAME}/ckpt/hypo*.test.txt`. `$
 
 After trained your model, you may want to evaluate two content scores via Bert classifier. This simplified model is devised from [the Texar implementation of BERT](https://github.com/asyml/texar/tree/master/examples/bert#use-other-datasetstasks). To evaluate the content fidelity, we simply concatenate each record of `x` or `x'` with `y` and classify whether `y` express the record. In this way, we construct the data in `../bert/E2E` to train the Bert classifier. 
 
+### Prepare data
 Run the following cmd to prepare data for evaluation:
 
 ```bash
@@ -64,6 +65,7 @@ which processes the previous `${EXPR_NAME}/ckpt/hypos${step}.valid.txt` into the
 * vocab_file: Path to a vocabary file used for tokenization. 
 * tfrecord_output_dir: The output path where the resulting TFRecord files will be put in. Be default, it is set to bert/E2E.
 
+### Train and evaluate
 To train and evaluate,run the following cmd:
 
 ```bash
@@ -78,6 +80,7 @@ Here:
 * output_dir: The output path where checkpoints and TensorBoard summaries are saved.
 Note that  since the special tokenization processing may meet OOV problem if the pretrained model is adopted . 
 
+### Restore and test
 Then, run the following command to restore and compute the two content scores:
 
 ```bash
