@@ -48,21 +48,39 @@ which uses GPU 0 to run IE models for all `${EXPR_NAME}/ckpt/hypo*.test.txt`. `$
 
 ## evaluate Content scores
 
-After trained your model, you may want to evaluate two content scores via Bert classifier. This part is devised from [the Texar implementation of BERT](https://github.com/asyml/texar/tree/master/examples/bert#use-other-datasetstasks). To evaluate the content fidelity, we simply concatenate each record of `x` or `x'` with `y` and classify whether `y` express the record. In this way, we construct the data in `../bert/E2E` to train the Bert classifier. 
+After trained your model, you may want to evaluate two content scores via Bert classifier. This simplified model is devised from [the Texar implementation of BERT](https://github.com/asyml/texar/tree/master/examples/bert#use-other-datasetstasks). To evaluate the content fidelity, we simply concatenate each record of `x` or `x'` with `y` and classify whether `y` express the record. In this way, we construct the data in `../bert/E2E` to train the Bert classifier. 
 
 Run the following cmd to prepare data for evaluation:
 
 ```bash
 python3 prepare_data.py --expr_name ${EXPR_NAME} --step ${step}
 [--max_seq_length=128]
-[--vocab_file=bert_pretrained_models/uncased_L-12_H-768_A-12/all.vocab.txt]
+[--vocab_file=bert_config/all.vocab.txt]
 [--tfrecord_output_dir=bert/E2E] 
 ```
-which processes the previous `${EXPR_NAME}/ckpt/hypos${step}.valid.txt` into the above mentioned `x | y` fomat in TFRecord data files. Specifically,
+which processes the previous `${EXPR_NAME}/ckpt/hypos${step}.valid.txt` into the above mentioned `x | y` fomat in TFRecord data files. Here:
 
+* max_seq_length: The maxium length of sequence. This includes BERT special tokens that will be automatically added. Longer sequence will be trimmed.
+* vocab_file: Path to a vocabary file used for tokenization. 
+* tfrecord_output_dir: The output path where the resulting TFRecord files will be put in. Be default, it is set to bert/E2E.
 
-Then, run the following command to compute the two content scores:
+To train and evaluate,run the following cmd:
 
 ```bash
-python bert_classifier_main.py  --do_test --config_data=config_data
+    python bert_classifier_main.py --do_train --do_eval
+    [--config_downstream=config_classifier]
+    [--config_data=config_data]
+    [--output_dir=output]
 ```
+Here:
+* config_downstream: Configuration of the downstream part. In this example, config_classifier configures the classification layer and the optimization method.
+* config_data: The data configuration. See the default config_data.py for example. Make sure to specify max_seq_length, and tfrecord_data_dir as used or output in the above data preparation step.
+* output_dir: The output path where checkpoints and TensorBoard summaries are saved.
+Note that  since the special tokenization processing may meet OOV problem if the pretrained model is adopted . 
+
+Then, run the following command to restore and compute the two content scores:
+
+```bash
+python bert_classifier_main.py  --do_test --config_data=config_data --checkpoint=output/model.ckpt
+```
+The cmd prints the two scores and the output is by default saved in `output/results_*.tsv`, where each line contains the predicted label for each sample.
