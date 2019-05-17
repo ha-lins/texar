@@ -48,14 +48,18 @@ which uses GPU 0 to run IE models for all `${EXPR_NAME}/ckpt/hypo*.test.txt`. `$
 
 ## evaluate Content scores
 
-After trained your model, you may want to evaluate two content scores via Bert classifier. This part is devised from [the Texar implementation of BERT](https://github.com/asyml/texar/tree/master/examples/bert#use-other-datasetstasks). To evaluate the content fidelity, we simply concatenate each record of `x/x'` with `y` and classify whether `y` express the record. In this way, we construct the data in `../bert/E2E` to train the Bert classifier. 
+After trained your model, you may want to evaluate two content scores via Bert classifier. This part is devised from [the Texar implementation of BERT](https://github.com/asyml/texar/tree/master/examples/bert#use-other-datasetstasks). To evaluate the content fidelity, we simply concatenate each record of `x` or `x'` with `y` and classify whether `y` express the record. In this way, we construct the data in `../bert/E2E` to train the Bert classifier. 
 
 Run the following cmd to prepare data for evaluation:
 
 ```bash
 python3 prepare_data.py --expr_name ${EXPR_NAME} --step ${step}
+[--max_seq_length=128]
+[--vocab_file=bert_pretrained_models/uncased_L-12_H-768_A-12/all.vocab.txt]
+[--tfrecord_output_dir=bert/E2E] 
 ```
-which process the previous `${EXPR_NAME}/ckpt/hypos${step}.valid.txt` into the above `x | y` fomat in TFRecord data files.
+which processes the previous `${EXPR_NAME}/ckpt/hypos${step}.valid.txt` into the above mentioned `x | y` fomat in TFRecord data files. Specifically,
+
 
 Then, run the following command to compute the two content scores:
 
