@@ -78,7 +78,7 @@ Here:
 * `config_downstream`: Configuration of the downstream part. In this example, `config_classifier` configures the classification layer and the optimization method.
 * `config_data`: The data configuration. See the default config_data.py for example. Make sure to specify max_seq_length, and tfrecord_data_dir as used or output in the above data preparation step.
 * `output_dir`: The output path where checkpoints and TensorBoard summaries are saved.
-Note that  since the special tokenization processing may meet OOV problem if the pretrained model is adopted . 
+Note that the special tokenization processing may meet OOV problem if the pretrained model is adopted . 
 
 ### Restore and test
 Then, run the following command to restore and compute the two content scores:
