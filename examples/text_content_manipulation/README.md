@@ -61,29 +61,29 @@ python3 prepare_data.py --expr_name ${EXPR_NAME} --step ${step}
 ```
 which processes the previous `${EXPR_NAME}/ckpt/hypos${step}.valid.txt` into the above mentioned `x | y` fomat in TFRecord data files. Here:
 
-* max_seq_length: The maxium length of sequence. This includes BERT special tokens that will be automatically added. Longer sequence will be trimmed.
-* vocab_file: Path to a vocabary file used for tokenization. 
-* tfrecord_output_dir: The output path where the resulting TFRecord files will be put in. Be default, it is set to bert/E2E.
+* `max_seq_length`: The maxium length of sequence. This includes BERT special tokens that will be automatically added. Longer sequence will be trimmed.
+* `vocab_file`: Path to a vocabary file used for tokenization. 
+* `tfrecord_output_dir`: The output path where the resulting TFRecord files will be put in. Be default, it is set to `bert/E2E`.
 
 ### Train and evaluate
 To train and evaluate,run the following cmd:
 
 ```bash
-    python bert_classifier_main.py --do_train --do_eval
-    [--config_downstream=config_classifier]
-    [--config_data=config_data]
-    [--output_dir=output]
+python3 bert_classifier_main.py --do_train --do_eval
+[--config_downstream=config_classifier]
+[--config_data=config_data]
+[--output_dir=output]
 ```
 Here:
-* config_downstream: Configuration of the downstream part. In this example, config_classifier configures the classification layer and the optimization method.
-* config_data: The data configuration. See the default config_data.py for example. Make sure to specify max_seq_length, and tfrecord_data_dir as used or output in the above data preparation step.
-* output_dir: The output path where checkpoints and TensorBoard summaries are saved.
+* `config_downstream`: Configuration of the downstream part. In this example, `config_classifier` configures the classification layer and the optimization method.
+* `config_data`: The data configuration. See the default config_data.py for example. Make sure to specify max_seq_length, and tfrecord_data_dir as used or output in the above data preparation step.
+* `output_dir`: The output path where checkpoints and TensorBoard summaries are saved.
 Note that  since the special tokenization processing may meet OOV problem if the pretrained model is adopted . 
 
 ### Restore and test
 Then, run the following command to restore and compute the two content scores:
 
 ```bash
-python bert_classifier_main.py  --do_test --config_data=config_data --checkpoint=output/model.ckpt
+python3 bert_classifier_main.py  --do_test --config_data=config_data --checkpoint=output/model.ckpt
 ```
 The cmd prints the two scores and the output is by default saved in `output/results_*.tsv`, where each line contains the predicted label for each sample.
