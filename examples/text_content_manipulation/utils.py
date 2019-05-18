@@ -8,18 +8,24 @@ from __future__ import print_function
 
 import collections
 import os
+import random
 import texar as tx
 from tensorflow.contrib.seq2seq import tile_batch
 from data2text.data_utils import get_train_ents, extract_entities, extract_numbers
 
 
 # load all entities
-all_ents, players, teams, cities = get_train_ents(path=os.path.join("data2text", "rotowire"), connect_multiwords=True)
-
+#all_ents, players, teams, cities = get_train_ents(path=os.path.join("data2text", "rotowire"), connect_multiwords=True)
+all_ents = set()
+with open('e2e_data/x_value.vocab.txt', 'r') as f:
+    all_vocb = f.readlines()
+    for vocab in all_vocb:
+        all_ents.add(vocab.strip('\n'))
 
 get_scope_name_of_train_op = 'train_{}'.format
 get_scope_name_of_summary_op = 'summary_{}'.format
-
+ref_strs = ['_', '_ref']
+sent_fields = ['y_aux', 'y_ref']
 
 x_fields = ['value', 'type', 'associated']
 x_strs = ['x', 'x_ref']
@@ -29,7 +35,7 @@ class DataItem(collections.namedtuple('DataItem', x_fields)):
     def __str__(self):
         return '|'.join(map(str, self))
 
-def pack_x(paired_texts):
+def pack_sd(paired_texts):
     return [DataItem(*_) for _ in zip(*paired_texts)]
 
 def batchize(func):
@@ -43,10 +49,15 @@ def strip_special_tokens_of_list(text):
 batch_strip_special_tokens_of_list = batchize(strip_special_tokens_of_list)
 
 def replace_data_in_sent(sent, token="<UNK>"):
-    datas = extract_entities(sent, all_ents) + extract_numbers(sent)
+
+    prob = random.random()
+    datas = extract_entities(sent, all_ents)
     datas.sort(key=lambda data: data.start, reverse=True)
     for data in datas:
-        sent[data.start : data.end] = token
+        #print('=============data is :{}'.format(data))
+        sent[data.start] = token
+    if prob <0.005:
+        print('=============masked sent is:{}'.format(sent))
     return sent
 
 def corpus_bleu(list_of_references, hypotheses, **kwargs):
@@ -72,7 +83,7 @@ def read_x(data_prefix, ref_flag, stage):
         zip(*map(
             lambda field: read_sents_from_file(
                 '{}{}{}.{}.txt'.format(data_prefix, field, ref_str, stage)),
-            sd_fields))))
+            x_fields))))
 
 def read_y(data_prefix, ref_flag, stage):
     ref_str = ref_strs[ref_flag]
