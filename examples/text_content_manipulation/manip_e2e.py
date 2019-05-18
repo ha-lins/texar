@@ -15,9 +15,9 @@ import numpy as np
 import tensorflow as tf
 import texar as tx
 import pickle
-from texar.modules import BasicCopyingMechanism, CopyNetWrapper
 from texar.core import get_train_op
-from utils import *
+from texar.modules import BasicCopyingMechanism, CopyNetWrapper
+from utils_e2e import *
 
 flags = tf.flags
 flags.DEFINE_string("config_data", "config_data_nba", "The data config.")
@@ -25,14 +25,14 @@ flags.DEFINE_string("config_model", "config_model", "The model config.")
 flags.DEFINE_string("config_train", "config_train", "The training config.")
 flags.DEFINE_float("rec_w", 0.8, "Weight of reconstruction loss.")
 flags.DEFINE_float("rec_w_rate", 0., "Increasing rate of rec_w.")
-flags.DEFINE_string("expr_name", "nba", "The experiment name. "
+flags.DEFINE_string("expr_name", "e2e", "The experiment name. "
                     "Used as the directory name of run.")
 flags.DEFINE_string("restore_from", "", "The specific checkpoint path to "
                     "restore from. If not specified, the latest checkpoint in "
                     "expr_name is used.")
 flags.DEFINE_float("exact_cover_w", 0., "Weight of exact coverage loss.")
 flags.DEFINE_float("eps", 1e-10, "epsilon used to avoid log(0).")
-flags.DEFINE_integer("disabled_vocab_size", 1238, "Disabled vocab size.")
+flags.DEFINE_integer("disabled_vocab_size", 0, "Disabled vocab size.")
 FLAGS = flags.FLAGS
 
 config_data = importlib.import_module(FLAGS.config_data)
@@ -272,7 +272,11 @@ def build_model(data_batch, data, step):
 
     decoder, tf_outputs, loss = teacher_forcing(rnn_cell, 1, 0, 'MLE')
     rec_decoder, _, rec_loss = teacher_forcing(rnn_cell, 1, 1, 'REC')
-    rec_weight = FLAGS.rec_w + FLAGS.rec_w_rate * tf.cast(step, tf.float32)
+    rec_weight = FLAGS.rec_w #+ FLAGS.rec_w_rate * tf.cast(step, tf.float32)
+    # step_stage = tf.cast(step, tf.float32) / tf.constant(600.0)
+    # rec_weight = tf.case([(tf.less_equal(step_stage, tf.constant(1.0)), lambda:tf.constant(1.0)),\
+    #                      (tf.greater(step_stage, tf.constant(2.0)), lambda:FLAGS.rec_w)],\
+    #                      default=lambda:tf.constant(1.0) - (step_stage - 1) * (1 - FLAGS.rec_w))
     joint_loss = (1 - rec_weight) * loss + rec_weight * rec_loss
     losses['joint'] = joint_loss
 
@@ -426,7 +430,7 @@ def main():
         bleus = []
         get_bleu_name = '{}_BLEU'.format
         print('In {} mode:'.format(mode))
-        for i in range(len(fetches[0])):
+        for i in range(1, 2):
             refs_ = list(map(lambda ref: ref[i:i+1], refs))
             bleu = corpus_bleu(refs_, hypos)
             print('{}: {:.2f}'.format(get_bleu_name(i), bleu))
