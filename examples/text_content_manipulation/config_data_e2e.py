@@ -1,6 +1,6 @@
 import os
 
-dataset_dir = 'nba_data'
+dataset_dir = 'e2e_data'
 mode_to_filemode = {
     'train': 'train',
     'val': 'valid',
