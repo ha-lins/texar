@@ -65,25 +65,13 @@ which processes the previous `${EXPR_NAME}/ckpt/hypos${step}.valid.txt` into the
 * `vocab_file`: Path to a vocabary file used for tokenization. 
 * `tfrecord_output_dir`: The output path where the resulting TFRecord files will be put in. Be default, it is set to `bert/E2E`.
 
-### Train and evaluate
-To train and evaluate,run the following cmd:
+
+### Restore and evaluate
+We provide a pretrained transformer classifier model [link](https://drive.google.com/drive/folders/1jNaJ_R_f89G8xbAC8iwe49Yx_Z-LXr0i), which achieves 92% accuracy on the test set. Make sure that the pretrained model is put into the `bert/classifier_ckpt/ckpt` directory. Before the evaluation for content, remember to modify the file name of `config_data.py` manually. Then, run the following command to restore and compute the two content scores:
 
 ```bash
-python3 bert_classifier_main.py --do_train --do_eval
-[--config_downstream=config_classifier]
-[--config_data=config_data]
-[--output_dir=output]
+cd bert/
+python3 bert_classifier_main.py  --do_pred --config_data=config_data --checkpoint=classifier_ckpt/ckpt/model.ckpt-15450
+[--output_dir=output_dir/]
 ```
-Here:
-* `config_downstream`: Configuration of the downstream part. In this example, `config_classifier` configures the classification layer and the optimization method.
-* `config_data`: The data configuration. See the default config_data.py for example. Make sure to specify max_seq_length, and tfrecord_data_dir as used or output in the above data preparation step.
-* `output_dir`: The output path where checkpoints and TensorBoard summaries are saved.
-Note that the special tokenization processing may meet OOV problem if the pretrained model is adopted . 
-
-### Restore and test
-Then, run the following command to restore and compute the two content scores:
-
-```bash
-python3 bert_classifier_main.py  --do_test --config_data=config_data --checkpoint=output/model.ckpt
-```
-The cmd prints the two scores and the output is by default saved in `output/results_*.tsv`, where each line contains the predicted label for each sample.
+The cmd prints the two scores and the output is by default saved in `output/results_*.tsv`, where each line contains the predicted label for each instance.
