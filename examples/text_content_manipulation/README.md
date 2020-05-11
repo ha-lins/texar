@@ -27,7 +27,7 @@ If you'd like to evaluate IE after training, you have to ensure Lua Torch is ins
 The following command illustrates how to run an experiment:
 
 ```bash
-python3 manip.py --attn_x --attn_y_ --copy_x --rec_w 0.8 --expr_name ${EXPR_NAME}
+python3 manip.py --attn_x --attn_y_ --copy_x --rec_w 0.8 --coverage --exact_cover_w 2.5 --expr_name ${EXPR_NAME}
 ```
 
 Where `${EXPR_NAME}` is the directory you'd like to store all the files related to your experiment, e.g. `my_expr`.
