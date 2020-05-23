@@ -36,6 +36,21 @@ Note that the code will automatically restore from the previously saved latest c
 
 You can start Tensorboard in your working directory and watch the curves and $\textrm{BLEU}(\hat{y}, y')$.
 
+For the template-based baseline:
+```bash
+python3 manip_rule.py --expr_name ${EXPR_NAME}
+```
+
+For the MAST baseline:
+```bash
+python3 manip_baseline.py --attn_x --attn_y_ --bt_w 0.1 --expr_name ${EXPR_NAME}
+```
+
+For the AdvST baseline:
+```bash
+python3 manip_baseline.py --attn_x --attn_y_ --bt_w 1 --adv_w 0.5 --expr_name ${EXPR_NAME}
+```
+
 ## evaluate IE scores
 
 After trained your model, you may want to evaluate IE (Information Retrieval) scores. The following command illustrates how to do it:
