@@ -1,0 +1,1 @@
+name eatType food priceRange area near
